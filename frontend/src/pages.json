@@ -1,0 +1,61 @@
+{
+  "pages": [
+    {
+      "path": "pages/index/index",
+      "style": {
+        "navigationBarTitleText": "GPS Tracking"
+      }
+    },
+    {
+      "path": "pages/history/history",
+      "style": {
+        "navigationBarTitleText": "Location History"
+      }
+    },
+    {
+      "path": "pages/simulation/simulation",
+      "style": {
+        "navigationBarTitleText": "GPS Simulation"
+      }
+    }
+  ],
+  "globalStyle": {
+    "navigationBarTextStyle": "white",
+    "navigationBarTitleText": "GPS Tracking",
+    "navigationBarBackgroundColor": "#007AFF",
+    "backgroundColor": "#F8F8F8",
+    "app-plus": {
+      "maps": {
+        "google": {
+          "apiKey": "MY_GOOGLE_API_KEY"
+        }
+      }
+    }
+  },
+  "tabBar": {
+    "color": "#7A7E83",
+    "selectedColor": "#007AFF",
+    "borderStyle": "black",
+    "backgroundColor": "#FFFFFF",
+    "list": [
+      {
+        "pagePath": "pages/index/index",
+        "iconPath": "static/images/tab-check-in.png",
+        "selectedIconPath": "static/images/tab-check-in-active.png",
+        "text": "Check-In"
+      },
+      {
+        "pagePath": "pages/history/history",
+        "iconPath": "static/images/tab-history.png",
+        "selectedIconPath": "static/images/tab-history-active.png",
+        "text": "History"
+      },
+      {
+        "pagePath": "pages/simulation/simulation",
+        "iconPath": "static/images/tab-simulation.png",
+        "selectedIconPath": "static/images/tab-simulation-active.png",
+        "text": "Simulation"
+      }
+    ]
+  }
+}

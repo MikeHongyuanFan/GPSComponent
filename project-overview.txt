@@ -1,0 +1,210 @@
+# ICcheckin Project Overview
+
+## Programming Language & Framework
+- Frontend: JavaScript/TypeScript
+  - Framework: Vue.js 2.6.x (Vue 2, not Vue 3)
+  - Cross-Platform Framework: uni-app (a Vue.js-based framework for building cross-platform applications)
+- Backend: Java
+  - Database: MySQL/PostgreSQL (for storing location data and user information)
+  - API Framework: Spring Boot
+
+## Architecture
+- Application Type: Mobile/cross-platform application
+- Build System: Vue CLI (with uni-app extensions)
+- Component Structure: Vue Single-File Components (.vue files)
+- State Management: Vuex (as indicated by the vuex dependency)
+- Platform Targets: Multiple platforms including:
+  - H5 (web)
+  - WeChat Mini Program
+  - App-plus (native mobile)
+  - Various other mini-program platforms (Baidu, Alipay, QQ, etc.)
+
+## Dependencies
+### Core Dependencies
+- @dcloudio/uni-app: Core uni-app framework (v2.0.2)
+- Vue.js: v2.6.14 (with explicit constraint to stay below v2.7)
+- Vuex: v3.2.0 (state management)
+- core-js: v3.8.3 (JavaScript polyfills)
+
+### UI Libraries
+- uview-plus: v3.4.6 (UI component library for uni-app)
+- uview-ui: v2.0.38 (Another UI component library)
+
+### Communication Libraries
+- @stomp/stompjs: v7.0.1 (STOMP messaging protocol client)
+- sockjs-client: v1.6.1 (WebSocket emulation)
+- stomp: v0.1.1 (STOMP client)
+- flyio: v0.6.2 (HTTP request library)
+
+### Push Notifications
+- @capacitor/push-notifications: v7.0.0 (Push notification handling)
+
+### Styling
+- sass: v1.85.1 (CSS preprocessor)
+
+## Development Dependencies
+- @dcloudio/types: TypeScript type definitions
+- @dcloudio/uni-automator: Testing utilities
+- @vue/cli-service: Vue CLI core service
+- @vue/cli-plugin-babel: Babel integration
+- cross-env: For setting environment variables across platforms
+- jest: Testing framework
+- babel-plugin-import: For optimized imports
+- postcss-comment: PostCSS plugin
+
+## Google Services Integration
+The project includes:
+- google-services.json: Configuration for Google services on Android
+- GoogleService-Info.plist: Configuration for Google services on iOS
+
+## Build Configuration
+- Uses webpack (via Vue CLI and uni-app plugins)
+- Supports multiple build targets through various npm scripts
+- Configured for both development and production environments
+
+## Target Platforms
+The project is configured to build for multiple platforms:
+- Web (H5)
+- Android/iOS (via app-plus)
+- WeChat Mini Program
+- Multiple other mini-program platforms (Baidu, Alipay, QQ, Toutiao, etc.)
+- QuickApp (various flavors)
+
+This appears to be a check-in application built with uni-app framework, designed to work across multiple platforms with a focus on mobile usage. The inclusion of STOMP and SockJS suggests it has real-time communication features, possibly for instant notifications or updates.
+
+## Node.js Compatibility
+The project appears to have compatibility issues with newer Node.js versions (v23+). For best results, use Node.js v16.x which is more compatible with the dependencies used in this project.
+
+## GPS Tracking Component Design
+
+### Frontend Component (Vue.js/uni-app)
+The GPS tracking component will be implemented as a Vue Single-File Component with the following features:
+
+#### User Interface Elements:
+- Interactive map showing employee location and travel history
+- Action buttons:
+  - "Clock In" (at office)
+  - "Clock In Remotely" (at client/meeting location)
+  - "Clock Out" (from any location)
+- Status display showing current work status and location
+
+#### Core Functionality:
+1. **Location Tracking**:
+   - Capture GPS coordinates every 20 seconds when active
+   - Detect if employee is within company premises
+   - Record travel paths between locations
+   - Mark meeting/client locations as special points
+
+2. **Status Management**:
+   - Track employee work status (In Office, Remote, Not Working)
+   - Record timestamps for all status changes
+   - Validate location for office check-ins
+
+3. **Data Visualization**:
+   - Display travel history as connected lines on map
+   - Show check-in/check-out points as prominent markers
+   - Provide visual indication of current status
+
+4. **Data Synchronization**:
+   - Send location updates to backend via REST API
+   - Handle offline scenarios with local storage
+   - Sync when connection is restored
+
+### Backend Services (Java)
+
+#### API Endpoints:
+1. **Location Data API**:
+   ```
+   POST /api/tracking/location
+   GET /api/tracking/history/{userId}
+   GET /api/tracking/current/{userId}
+   ```
+
+2. **Status Management API**:
+   ```
+   POST /api/user/status
+   GET /api/user/status/{userId}
+   ```
+
+3. **Company Location API**:
+   ```
+   GET /api/company/locations
+   ```
+
+#### Database Schema:
+
+1. **User Tracking Table**:
+   ```sql
+   CREATE TABLE user_tracking (
+     id BIGINT PRIMARY KEY AUTO_INCREMENT,
+     user_id BIGINT NOT NULL,
+     tracking_type VARCHAR(20) NOT NULL, -- CLOCK_IN_OFFICE, CLOCK_IN_REMOTE, CLOCK_OUT, TRACKING_POINT
+     latitude DECIMAL(10,7) NOT NULL,
+     longitude DECIMAL(10,7) NOT NULL,
+     timestamp TIMESTAMP NOT NULL,
+     accuracy FLOAT,
+     battery_level INT,
+     network_type VARCHAR(20),
+     FOREIGN KEY (user_id) REFERENCES users(id)
+   );
+   ```
+
+2. **User Status Table**:
+   ```sql
+   CREATE TABLE user_status (
+     id BIGINT PRIMARY KEY AUTO_INCREMENT,
+     user_id BIGINT NOT NULL,
+     status VARCHAR(20) NOT NULL, -- WORKING_OFFICE, WORKING_REMOTE, NOT_WORKING
+     start_time TIMESTAMP NOT NULL,
+     end_time TIMESTAMP,
+     FOREIGN KEY (user_id) REFERENCES users(id)
+   );
+   ```
+
+3. **Company Locations Table**:
+   ```sql
+   CREATE TABLE company_locations (
+     id BIGINT PRIMARY KEY AUTO_INCREMENT,
+     name VARCHAR(100) NOT NULL,
+     address VARCHAR(255),
+     latitude DECIMAL(10,7) NOT NULL,
+     longitude DECIMAL(10,7) NOT NULL,
+     radius INT NOT NULL, -- Radius in meters to consider "at company"
+     is_active BOOLEAN DEFAULT true
+   );
+   ```
+
+#### Java Service Classes:
+
+1. **LocationTrackingService**:
+   - Handle incoming location data
+   - Process and store tracking points
+   - Calculate distances and validate locations
+
+2. **UserStatusService**:
+   - Manage user work status changes
+   - Validate status transitions
+   - Record work hours and locations
+
+3. **GeoCalculationService**:
+   - Calculate distances between coordinates
+   - Determine if user is within company premises
+   - Process travel paths and calculate metrics
+
+### Integration Points:
+- Frontend communicates with backend via REST APIs
+- Real-time notifications via WebSocket/STOMP
+- Authentication via JWT tokens
+- Offline support with local storage and sync
+
+### Security Considerations:
+- Location data encrypted in transit (HTTPS)
+- User permissions for accessing location history
+- Privacy controls for tracking (only during work hours)
+- Secure storage of sensitive location data
+
+### Performance Optimizations:
+- Batch processing of tracking points
+- Efficient polyline algorithms for map rendering
+- Geospatial indexing for location queries
+- Battery-efficient location tracking

@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Mock API Test</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+      line-height: 1.6;
+    }
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+    }
+    h1 {
+      color: #333;
+    }
+    .test-section {
+      margin-bottom: 30px;
+      padding: 15px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+    }
+    button {
+      padding: 8px 16px;
+      background-color: #4285F4;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      margin-right: 10px;
+      margin-bottom: 10px;
+    }
+    button:hover {
+      background-color: #3367D6;
+    }
+    pre {
+      background-color: #f5f5f5;
+      padding: 10px;
+      border-radius: 4px;
+      overflow-x: auto;
+    }
+    .success {
+      color: green;
+      font-weight: bold;
+    }
+    .error {
+      color: red;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Mock API Test</h1>
+    <p>This page tests the connection to the mock API server running on http://localhost:3000</p>
+    
+    <div class="test-section">
+      <h2>API Status</h2>
+      <button onclick="testApiConnection()">Test API Connection</button>
+      <div id="api-status"></div>
+    </div>
+    
+    <div class="test-section">
+      <h2>Tracking Endpoints</h2>
+      <button onclick="getLocationHistory(1)">Get Location History (User 1)</button>
+      <button onclick="getCurrentLocation(1)">Get Current Location (User 1)</button>
+      <div id="tracking-result"></div>
+    </div>
+    
+    <div class="test-section">
+      <h2>User Status Endpoints</h2>
+      <button onclick="getUserStatus(1)">Get User Status (User 1)</button>
+      <div id="user-status-result"></div>
+    </div>
+    
+    <div class="test-section">
+      <h2>Company Locations</h2>
+      <button onclick="getCompanyLocations()">Get Company Locations</button>
+      <div id="company-locations-result"></div>
+    </div>
+    
+    <div class="test-section">
+      <h2>Simulation Endpoints</h2>
+      <button onclick="getAvailableRoutes()">Get Available Routes</button>
+      <button onclick="getActiveSimulations()">Get Active Simulations</button>
+      <div id="simulation-result"></div>
+    </div>
+  </div>
+
+  <script>
+    const apiBaseUrl = 'http://localhost:3000';
+    
+    // Helper function to make API requests
+    async function fetchApi(endpoint, options = {}) {
+      try {
+        const response = await fetch(`${apiBaseUrl}${endpoint}`, options);
+        if (!response.ok) {
+          throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+        return await response.json();
+      } catch (error) {
+        console.error('API request failed:', error);
+        return { error: error.message };
+      }
+    }
+    
+    // Display results in the specified element
+    function displayResult(elementId, data, isSuccess = true) {
+      const element = document.getElementById(elementId);
+      const statusClass = isSuccess ? 'success' : 'error';
+      
+      if (isSuccess) {
+        element.innerHTML = `
+          <p class="${statusClass}">Success!</p>
+          <pre>${JSON.stringify(data, null, 2)}</pre>
+        `;
+      } else {
+        element.innerHTML = `
+          <p class="${statusClass}">Error: ${data.error}</p>
+        `;
+      }
+    }
+    
+    // Test API connection
+    async function testApiConnection() {
+      const statusElement = document.getElementById('api-status');
+      statusElement.innerHTML = '<p>Testing connection...</p>';
+      
+      try {
+        const response = await fetch(`${apiBaseUrl}/`);
+        if (response.ok) {
+          const data = await response.json();
+          statusElement.innerHTML = `
+            <p class="success">API is running!</p>
+            <pre>${JSON.stringify(data, null, 2)}</pre>
+          `;
+        } else {
+          statusElement.innerHTML = `
+            <p class="error">API returned status: ${response.status}</p>
+          `;
+        }
+      } catch (error) {
+        statusElement.innerHTML = `
+          <p class="error">Failed to connect to API: ${error.message}</p>
+          <p>Make sure the mock API server is running on port 3000</p>
+        `;
+      }
+    }
+    
+    // Get location history for a user
+    async function getLocationHistory(userId) {
+      const data = await fetchApi(`/api/tracking/history/${userId}`);
+      displayResult('tracking-result', data, !data.error);
+    }
+    
+    // Get current location for a user
+    async function getCurrentLocation(userId) {
+      const data = await fetchApi(`/api/tracking/current/${userId}`);
+      displayResult('tracking-result', data, !data.error);
+    }
+    
+    // Get user status
+    async function getUserStatus(userId) {
+      const data = await fetchApi(`/api/user/status/${userId}`);
+      displayResult('user-status-result', data, !data.error);
+    }
+    
+    // Get company locations
+    async function getCompanyLocations() {
+      const data = await fetchApi('/api/company/locations');
+      displayResult('company-locations-result', data, !data.error);
+    }
+    
+    // Get available routes
+    async function getAvailableRoutes() {
+      const data = await fetchApi('/api/simulation/routes');
+      displayResult('simulation-result', data, !data.error);
+    }
+    
+    // Get active simulations
+    async function getActiveSimulations() {
+      const data = await fetchApi('/api/simulation/active');
+      displayResult('simulation-result', data, !data.error);
+    }
+    
+    // Test the API connection when the page loads
+    window.onload = testApiConnection;
+  </script>
+</body>
+</html>

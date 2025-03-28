@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>GPS Tracking Demo</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="app-container">
+    <header>
+      <h1>GPS Tracking Check-In System</h1>
+      <div class="user-info">
+        <span id="user-name">User: John Doe</span>
+        <span id="user-status">Status: Not Working</span>
+      </div>
+    </header>
+
+    <nav>
+      <ul class="tabs">
+        <li class="tab active" data-tab="check-in">Check-In</li>
+        <li class="tab" data-tab="history">History</li>
+        <li class="tab" data-tab="simulation">Simulation</li>
+      </ul>
+    </nav>
+
+    <main>
+      <!-- Check-In Tab -->
+      <section id="check-in" class="tab-content active">
+        <div class="map-container">
+          <div id="main-map"></div>
+        </div>
+        
+        <div class="action-panel">
+          <h2>Check-In Actions</h2>
+          <div class="action-buttons">
+            <button id="btn-clock-in-office" class="btn btn-primary">Clock In (Office)</button>
+            <button id="btn-clock-in-remote" class="btn btn-secondary">Clock In (Remote)</button>
+            <button id="btn-clock-out" class="btn btn-danger" disabled>Clock Out</button>
+          </div>
+          
+          <div class="current-location">
+            <h3>Current Location</h3>
+            <div id="current-location-info">
+              <p>Latitude: <span id="current-lat">--</span></p>
+              <p>Longitude: <span id="current-lng">--</span></p>
+              <p>Last Updated: <span id="current-time">--</span></p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- History Tab -->
+      <section id="history" class="tab-content">
+        <h2>Location History</h2>
+        <div class="filter-controls">
+          <label>
+            Date:
+            <input type="date" id="history-date" value="">
+          </label>
+          <button id="btn-filter-history" class="btn btn-small">Filter</button>
+        </div>
+        
+        <div class="history-map-container">
+          <div id="history-map"></div>
+        </div>
+        
+        <div class="history-list">
+          <h3>Tracking Points</h3>
+          <div id="history-items"></div>
+        </div>
+      </section>
+
+      <!-- Simulation Tab -->
+      <section id="simulation" class="tab-content">
+        <h2>GPS Simulation</h2>
+        
+        <div class="simulation-controls">
+          <div class="form-group">
+            <label for="route-select">Route:</label>
+            <select id="route-select">
+              <option value="">Select a route</option>
+            </select>
+          </div>
+          
+          <div class="form-group">
+            <label for="interval-slider">Interval (seconds):</label>
+            <input type="range" id="interval-slider" min="5" max="30" step="5" value="10">
+            <span id="interval-value">10</span>
+          </div>
+          
+          <div class="form-group checkbox">
+            <label for="auto-clock-in">Auto Clock-In:</label>
+            <input type="checkbox" id="auto-clock-in" checked>
+          </div>
+          
+          <div class="form-group checkbox">
+            <label for="auto-clock-out">Auto Clock-Out:</label>
+            <input type="checkbox" id="auto-clock-out" checked>
+          </div>
+          
+          <button id="btn-toggle-simulation" class="btn btn-primary">Start Simulation</button>
+        </div>
+        
+        <div id="simulation-status" class="simulation-status hidden">
+          <h3>Simulation Active</h3>
+          <p>Route: <span id="active-route">--</span></p>
+          <p>Progress: <span id="simulation-progress">--</span></p>
+          <p>Started: <span id="simulation-start-time">--</span></p>
+        </div>
+        
+        <div class="route-preview">
+          <h3>Route Preview</h3>
+          <div id="route-preview-map"></div>
+          <div id="route-details">
+            <p>Start: <span id="route-start">--</span></p>
+            <p>End: <span id="route-end">--</span></p>
+            <p>Points: <span id="route-points">--</span></p>
+          </div>
+        </div>
+        
+        <div class="create-route">
+          <h3>Create Custom Route</h3>
+          <div class="form-group">
+            <label for="new-route-name">Route Name:</label>
+            <input type="text" id="new-route-name" placeholder="Enter route name">
+          </div>
+          
+          <div class="form-group">
+            <label>Start Point:</label>
+            <div class="coordinate-inputs">
+              <input type="number" id="start-lat" placeholder="Latitude" step="0.0001">
+              <input type="number" id="start-lng" placeholder="Longitude" step="0.0001">
+            </div>
+          </div>
+          
+          <div class="form-group">
+            <label>End Point:</label>
+            <div class="coordinate-inputs">
+              <input type="number" id="end-lat" placeholder="Latitude" step="0.0001">
+              <input type="number" id="end-lng" placeholder="Longitude" step="0.0001">
+            </div>
+          </div>
+          
+          <div class="form-group">
+            <label for="point-count">Number of Points:</label>
+            <input type="range" id="point-count" min="2" max="20" value="5">
+            <span id="point-count-value">5</span>
+          </div>
+          
+          <button id="btn-create-route" class="btn btn-secondary">Create Route</button>
+        </div>
+        
+        <div class="active-simulations">
+          <h3>Active Simulations</h3>
+          <div id="active-simulations-list"></div>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <p>GPS Tracking Check-In System Demo</p>
+    </footer>
+  </div>
+
+  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBoZyfQEmKLOMecu7rtYz07dGWwrV2tH4c"></script>
+  <script src="app.js"></script>
+</body>
+</html>
